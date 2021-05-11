@@ -1,0 +1,10 @@
+{
+    "python.pythonPath": "python3",
+    "cSpell.words": [
+        "Uncreate",
+        "arange",
+        "manim",
+        "nums"
+    ],
+    "python.formatting.provider": "black"
+}
