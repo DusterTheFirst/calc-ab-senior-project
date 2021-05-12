@@ -31,15 +31,15 @@ class Derivative(GraphScene):
             Text("Zachary Kohnen").set_color(BLUE).scale(0.5).shift(DOWN * 0.7)
         )
 
-        self.play(Create(title_text), Create(subtitle_text))
+        self.play(Write(title_text), Write(subtitle_text))
         self.wait(2)
-        self.play(title_text.animate.scale(0.3).to_edge(UL), Uncreate(subtitle_text))
+        self.play(title_text.animate.scale(0.3).to_edge(UL), Unwrite(subtitle_text))
         self.wait(0.25)
 
         # Setup Graph
 
         graph_title = MathTex("f(x) = x \\times sin(x^{2}) + 1")
-        self.play(Create(graph_title))
+        self.play(Write(graph_title))
         self.wait(2)
         self.play(graph_title.animate.to_edge(UR).scale(0.5))
 
@@ -74,17 +74,48 @@ class Derivative(GraphScene):
 
         slope_brace_label = slope_brace.get_text("Line Tangent to the Curve")
 
-        self.play(Create(slope_brace), Create(slope_brace_label))
+        self.play(Create(slope_brace), Write(slope_brace_label))
 
         self.wait()
 
-        self.play(Uncreate(slope_brace), Uncreate(slope_brace_label))
+        self.play(Uncreate(slope_brace), Unwrite(slope_brace_label))
 
         slope_line.add_updater(line_updater)
         self.play(
             MoveAlongPath(intersect_dot, func_graph, rate_func=linear, run_time=4)
         )
+        self.wait()
+
+        self.play(Uncreate(slope_line))
+
+        self.play(intersect_dot.animate.move_to(self.coords_to_point(1, function(1))))
+
+        self.play(Create(slope_line))
         slope_line.remove_updater(line_updater)
+
+
+        slope_text = (
+            Tex(
+                f"Exact slope at $x = 1$ is ${round(self.slope_of_tangent(1, func_graph), 2)}$"
+            )
+            .scale(0.75)
+            .move_to(self.coords_to_point(1.5, 4))
+        )
+
+        self.play(Write(slope_text))
+
+        self.play(Uncreate(slope_line), Uncreate(intersect_dot))
+
+        secant_text = (
+            Tex(
+                f"Approximate slope at $x = 1$ is ",
+                "$TODO$"
+            )
+            .scale(0.75)
+            .move_to(self.coords_to_point(1.5, 3.5))
+        )
+
+        self.play(Write(secant_text))
 
         # d1 = Dot()
         # d2 = Dot()
