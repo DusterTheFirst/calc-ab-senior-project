@@ -38,7 +38,7 @@ class Derivative(GraphScene):
 
         # Setup Graph
 
-        graph_title = MathTex("f(x) = x \\times sin(x^{2}) + 1")
+        graph_title = MathTex("f(x) = x \\times \sin(x^{2}) + 1")
         self.play(Write(graph_title))
         self.wait(2)
         self.play(graph_title.animate.to_edge(UR).scale(0.5))
