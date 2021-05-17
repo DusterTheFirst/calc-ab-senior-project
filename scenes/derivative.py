@@ -43,6 +43,9 @@ class Derivative(GraphScene):
         self.wait(2)
         self.play(graph_title.animate.to_edge(UR).scale(0.5))
 
+        # TODO: Remove
+        self.play(Write(Text("WIP", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(6)))
+
         self.setup_axes(True)
         func_graph = self.get_graph(function, x_min=-2, x_max=3)
         self.play(Create(func_graph, run_time=1.5))
@@ -72,7 +75,7 @@ class Derivative(GraphScene):
             ),
         )
 
-        slope_brace_label = slope_brace.get_text("Line Tangent to the Curve")
+        slope_brace_label = slope_brace.get_text("Tangent Line")
 
         self.play(Create(slope_brace), Write(slope_brace_label))
 
@@ -93,48 +96,67 @@ class Derivative(GraphScene):
         self.play(Create(slope_line))
         slope_line.remove_updater(line_updater)
 
-
         slope_text = (
             Tex(
                 f"Exact slope at $x = 1$ is ${round(self.slope_of_tangent(1, func_graph), 2)}$"
             )
             .scale(0.75)
-            .move_to(self.coords_to_point(1.5, 4))
+            .move_to(self.coords_to_point(0, 4.5))
+            .to_edge(LEFT)
         )
 
         self.play(Write(slope_text))
 
         self.play(Uncreate(slope_line), Uncreate(intersect_dot))
 
+        secant_start = Dot().move_to(self.coords_to_point(-1, function(-1)))
+        secant_end = Dot().move_to(self.coords_to_point(1, function(1)))
+        secant_line = Line(
+            secant_start.get_center(), secant_end.get_center()
+        ).set_color(PURPLE)
+
+        self.play(Create(secant_start), Create(secant_end), Create(secant_line))
+
         secant_text = (
-            Tex(
-                f"Approximate slope at $x = 1$ is ",
-                "$TODO$"
-            )
+            Tex("Approx. slope at $x = 1$ is ")
             .scale(0.75)
-            .move_to(self.coords_to_point(1.5, 3.5))
+            .move_to(self.coords_to_point(0, 4))
+            .to_edge(LEFT)
         )
 
+        secant_slope = (
+            DecimalNumber(secant_line.get_slope()).scale(0.75).next_to(secant_text, RIGHT)
+        )
+
+        secant_slope_brace = Brace(
+            secant_line,
+            direction=rotate_vector(
+                LEFT, secant_line.get_angle() - np.pi / 2
+            )
+        )
+
+        secant_slope_brace_label = secant_slope_brace.get_text("Secant Line").rotate(secant_line.get_angle())
+
+        # TODO: Zoom in on secant as it gets smaller and smaller
+
+        self.play(Create(secant_slope_brace), Write(secant_slope_brace_label))
         self.play(Write(secant_text))
+        self.play(Write(secant_slope))
+    
+        self.wait()
 
-        # d1 = Dot()
-        # d2 = Dot()
-        # l1 = Line(d1.get_center(), d2.get_center()).set_color(ORANGE)
+        self.play(Uncreate(secant_slope_brace), Unwrite(secant_slope_brace_label))
 
-        # x = ValueTracker(0)
-        # y = ValueTracker(0)
+        secant_line.add_updater(
+            lambda l: l.put_start_and_end_on(
+                secant_start.get_center(), secant_end.get_center()
+            )
+        )
 
-        # d1.add_updater(lambda z: z.set_x(x.get_value()))
-        # d2.add_updater(lambda z: z.set_y(y.get_value()))
-        # l1.add_updater(
-        #     lambda z: z.become(Line(d1.get_center(), d2.get_center()).set_color(ORANGE))
-        # )
+        secant_slope.add_updater(lambda t: t.set_value(secant_line.get_slope()))
 
-        # b1 = Brace(line)
-        # b1text = b1.get_text("Horizontal distance")
-        # b2 = Brace(line, direction=line.copy().rotate(PI / 2).get_unit_vector())
-        # b2text = b2.get_tex("x-x_1")
+        func_part = self.get_graph(function, x_min=-1, x_max=0.999)
 
-        # self.play(x.animate.set_value(5))
-        # self.play(y.animate.set_value(4))
+        self.play(MoveAlongPath(secant_start, func_part, rate_func=linear, run_time=4))
+
         self.wait()
