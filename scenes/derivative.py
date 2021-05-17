@@ -25,6 +25,9 @@ class Derivative(GraphScene):
         )
 
     def construct(self):
+        # TODO: Remove
+        self.play(Write(Text("DRAFT", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(6)))
+
         # Introduction
         title_text = Text("Derivatives From Secant Lines").set_color(ORANGE)
         subtitle_text = (
@@ -42,9 +45,6 @@ class Derivative(GraphScene):
         self.play(Write(graph_title))
         self.wait(2)
         self.play(graph_title.animate.to_edge(UR).scale(0.5))
-
-        # TODO: Remove
-        self.play(Write(Text("WIP", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(6)))
 
         self.setup_axes(True)
         func_graph = self.get_graph(function, x_min=-2, x_max=3)
