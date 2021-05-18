@@ -10,7 +10,7 @@ def function(x):
 #     return np.sin(x ** 2) + 2 * (x ** 2) * np.cos(x ** 2)
 
 
-class Derivative(GraphScene):
+class Derivative(GraphScene, ZoomedScene):
     def __init__(self, **kwargs):
         GraphScene.__init__(
             self,
@@ -24,9 +24,25 @@ class Derivative(GraphScene):
             **kwargs,
         )
 
+        ZoomedScene.__init__(
+            self,
+            zoom_factor=0.3,
+            zoomed_display_height=4,
+            zoomed_display_width=4,
+            image_frame_stroke_width=20,
+            zoomed_camera_config={
+                "default_frame_stroke_width": 3,
+            },
+            **kwargs
+        )
+
+    def setup(self):
+        GraphScene.setup(self)
+        ZoomedScene.setup(self)
+
     def construct(self):
         # TODO: Remove
-        self.play(Write(Text("DRAFT", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(6)))
+        self.play(Write(Text("DRAFT", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(4)))
 
         # Introduction
         title_text = Text("Derivatives From Secant Lines").set_color(ORANGE)
@@ -115,7 +131,7 @@ class Derivative(GraphScene):
             secant_start.get_center(), secant_end.get_center()
         ).set_color(PURPLE)
 
-        self.play(Create(secant_start), Create(secant_end), Create(secant_line))
+        self.play(Create(secant_line), Create(secant_start), Create(secant_end))
 
         secant_text = (
             Tex("Approx. slope at $x = 1$ is ")
@@ -137,8 +153,6 @@ class Derivative(GraphScene):
 
         secant_slope_brace_label = secant_slope_brace.get_text("Secant Line").rotate(secant_line.get_angle())
 
-        # TODO: Zoom in on secant as it gets smaller and smaller
-
         self.play(Create(secant_slope_brace), Write(secant_slope_brace_label))
         self.play(Write(secant_text))
         self.play(Write(secant_slope))
@@ -155,8 +169,29 @@ class Derivative(GraphScene):
 
         secant_slope.add_updater(lambda t: t.set_value(secant_line.get_slope()))
 
-        func_part = self.get_graph(function, x_min=-1, x_max=0.999)
+        func_part = self.get_graph(function, x_min=-1, x_max=0.5)
 
         self.play(MoveAlongPath(secant_start, func_part, rate_func=linear, run_time=4))
+
+        zoomed_camera = self.zoomed_camera
+        zoomed_display = self.zoomed_display
+        frame = zoomed_camera.frame
+        zoomed_display_frame = zoomed_display.display_frame
+
+        frame.add_updater(lambda f: f.move_to(secant_line.get_center()))
+        frame.set_color(PURPLE)
+        zoomed_display_frame.set_color(RED)
+        zoomed_display.shift(DOWN)
+
+        self.play(Create(frame))
+        self.activate_zooming()
+
+        self.play(self.get_zoomed_display_pop_out_animation())
+
+        func_part = self.get_graph(function, x_min=0.5, x_max=.8)
+
+        self.play(MoveAlongPath(secant_start, func_part, rate_func=linear, run_time=4))
+
+        self.play(frame.animate.scale(.75))
 
         self.wait()
