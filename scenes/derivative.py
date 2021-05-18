@@ -41,8 +41,7 @@ class Derivative(GraphScene, ZoomedScene):
         ZoomedScene.setup(self)
 
     def construct(self):
-        # TODO: Remove
-        self.play(Write(Text("DRAFT", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(4)))
+        # self.play(Write(Text("DRAFT", color="#808080", fill_opacity=.25).rotate(np.pi/4).scale(4)))
 
         # Introduction
         title_text = Text("Derivatives From Secant Lines").set_color(ORANGE)
